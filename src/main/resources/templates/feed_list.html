@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Feed List</title>
+</head>
+<body>
+<h1>Feed List</h1>
+<table>
+    <tr><th>Vendor</th><th>FeedName</th></tr>
+    <tr th:each=" feed : ${feeds}">
+        <td><span th:text="${feed.vendorName}"></span></td>
+        <td><span th:text="${feed.name}"></span></td>
+    </tr>
+</table>
+</body>
+</html>
