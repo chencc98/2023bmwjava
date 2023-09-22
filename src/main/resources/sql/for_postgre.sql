@@ -11,6 +11,12 @@ CREATE TABLE public.vendor (
 	CONSTRAINT vendor_code_unique UNIQUE (code),
 	CONSTRAINT vendor_pk PRIMARY KEY (uuid)
 );
+insert into vendor(uuid, code, name, created_by, last_updated_by)
+    values('uuid1', 'ISHARE', 'iShared', 'carl', 'carl');
+insert into vendor(uuid, code, name, created_by, last_updated_by)
+    values('uuid2', 'BGF', 'BGF', 'carl', 'carl');
+insert into vendor(uuid, code, name, created_by, last_updated_by)
+    values('uuid3', 'TESTV', 'test vendor', 'carl', 'carl');
 
 --feed
 CREATE TABLE public.feed (
@@ -27,6 +33,12 @@ CREATE TABLE public.feed (
 	CONSTRAINT feed_pk PRIMARY KEY (uuid),
 	CONSTRAINT feed_fk FOREIGN KEY (vendor_uuid) REFERENCES public.vendor(uuid) ON DELETE RESTRICT ON UPDATE CASCADE
 );
+--fid1, uuid3,test.csv, CSV, alias, asofdate
+insert  into feed (uuid, vendor_uuid,name,created_by,last_updated_by,format,alias_extract, asofdate_extract)
+  values ('fid1','uuid3','test.csv','carl','carl','CSV','alias', 'as_of_date');
+  
+insert  into feed (uuid, vendor_uuid,name,created_by,last_updated_by,format,alias_extract, asofdate_extract)
+  values ('fid2','uuid3','testbyapi.csv','carl','carl','CSV','alias', 'as_of_date');
 
 --schedule
 CREATE TABLE public.schedule_type (
@@ -73,7 +85,8 @@ CREATE TABLE public.push_method (
 	CONSTRAINT push_method_pk PRIMARY KEY (uuid),
 	CONSTRAINT push_method_code_uniq UNIQUE (code)
 );
-
+insert  into push_method (uuid, code, name, worker_class, created_by, last_updated_by)
+  values ('push1', 'API', 'push by api', 'com.example.pipeline.inbound.PushByApiWorker', 'carl','carl');
 
 --feed inbound
 CREATE TABLE public.feed_inbound (
@@ -97,6 +110,16 @@ CREATE TABLE public.feed_inbound (
 	CONSTRAINT feed_inbound_fk_2 FOREIGN KEY (schedule_type_uuid) REFERENCES public.schedule_type(uuid) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT feed_inbound_fk_3 FOREIGN KEY (push_method_uuid) REFERENCES public.push_method(uuid) ON DELETE RESTRICT ON UPDATE CASCADE
 );
+insert  into feed_inbound (uuid,feed_uuid,inbound_type,pull_method_uuid,schedule_type_uuid,schedule_value,
+   pull_attr,created_by,last_updated_by)
+   values ('inbound1','fid1','PULL','pull1','uuid1','0 */5 * * * *',
+   '{"jdbcConntionString":"jdbc:postgresql://carltestpg1.postgres.database.azure.com:5432/data_pipeline?sslmode=allow&user=carltestpg1@carltestpg1","username":"carltestpg1@carltestpg1","password":"1qaz2wsx=","sqlToRun":"select * from testdata.fund_element_data"}',
+   'carl', 'carl');
+insert  into feed_inbound (uuid,feed_uuid,inbound_type,push_method_uuid,
+   push_attr,created_by,last_updated_by)
+   values ('inbound2','fid2','PUSH','push1',
+   'secret-123456',
+   'carl', 'carl');
 
 -- Column comments
 

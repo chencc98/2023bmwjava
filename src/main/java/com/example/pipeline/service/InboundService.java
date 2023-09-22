@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.pipeline.dao.FeedDao;
+import com.example.pipeline.entity.Feed;
 import com.example.pipeline.entity.FeedInbound;
+import com.example.pipeline.inbound.PushRequest;
 
 @Service
 public class InboundService {
@@ -21,5 +23,9 @@ public class InboundService {
 
     public void updateInboundLastRunTs(FeedInbound inbound, Date lastRunTs, String who) {
         feedDao.updateInboundLastRunTs(inbound, who, lastRunTs);
+    }
+
+    public FeedInbound getInboundByPushRequest(PushRequest request) {
+        return feedDao.getInbound(request);
     }
 }

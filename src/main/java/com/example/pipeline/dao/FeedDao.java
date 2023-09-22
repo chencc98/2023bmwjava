@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import com.example.pipeline.entity.Feed;
 import com.example.pipeline.entity.FeedInbound;
 import com.example.pipeline.entity.InboundType;
+import com.example.pipeline.inbound.PushRequest;
 
 @Component
 public class FeedDao {
@@ -30,6 +31,20 @@ public class FeedDao {
         + " left join schedule_type st on fid.schedule_type_uuid = st.uuid "
         + " left join push_method push on fid.push_method_uuid = push.uuid "
         + "where inbound_type = :inbound_type";
+
+    private static String getFeedInboundPushRequestSql = "select fid.uuid,fid.feed_uuid,inbound_type,"
+        + "pull.code as pull_method_code, pull.worker_class as pull_method_worker,"
+        + "st.code as schedule_code, fid.schedule_value,fid.pull_attr,"
+        + "push.code as push_method_code, push.worker_class as push_method_worker,"
+        + "fid.push_attr, fid.previous_run_ts, fd.name as feed_name,v.code as vendor_code "
+        + "from feed_inbound fid join feed fd on fid.feed_uuid = fd.uuid "
+        + " join vendor v on fd.vendor_uuid = v.uuid "
+        + "left join pull_method pull on fid.pull_method_uuid = pull.uuid "
+        + " left join schedule_type st on fid.schedule_type_uuid = st.uuid "
+        + " left join push_method push on fid.push_method_uuid = push.uuid "
+        + "where inbound_type = :inbound_type and v.code = :vendor_code "
+        + " and fid.uuid = :inbound_id and fd.name = :feed_name "
+        + " and fid.push_attr = :push_secret ";
 
     private static String updateInboundLastRunTsSql = "update feed_inbound set previous_run_ts ="
         + " :last_run_ts, last_updated_by = :updated_by, last_updated_ts = :updated_ts where uuid = :uuid";
@@ -58,6 +73,21 @@ public class FeedDao {
             .addValue("updated_ts", new Date())
             .addValue("uuid", inbound.getUuid());
         jdbcTemplate.update(updateInboundLastRunTsSql, source);
+    }
+
+    public FeedInbound getInbound(PushRequest request) {
+        MapSqlParameterSource source = new MapSqlParameterSource()
+            .addValue("inbound_type", "PUSH")
+            .addValue("vendor_code", request.getVendorCode())
+            .addValue("inbound_id", request.getInboundUuid())
+            .addValue("feed_name", request.getFeedName())
+            .addValue("push_secret", request.getPushSecret());
+        List<FeedInbound> list = jdbcTemplate.query(getFeedInboundPushRequestSql, source,
+            new BeanPropertyRowMapper<FeedInbound>(FeedInbound.class));
+        if(list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
     }
 
 }

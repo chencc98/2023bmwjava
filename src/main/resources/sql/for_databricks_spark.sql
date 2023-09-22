@@ -1,4 +1,4 @@
--- hive_metadata, default
+-- hive_metadata, default  dbs_fund_insight
 --vendor
 CREATE TABLE vendor (
 	uuid String,
@@ -92,6 +92,8 @@ CREATE TABLE batch (
 	uuid String,
 	feed_uuid String,
 	inbound_uuid String,
+	record int,
+	path string,
 	status String,
 	message String,
 	created_by String,
@@ -184,7 +186,9 @@ create table fct_fund_nav_price (
 	created_by String,
 	created_ts timestamp,
 	last_updated_by String,
-	last_updated_ts timestamp 
+	last_updated_ts timestamp ,
+	daily_nav_change string,
+	daily_nav_change_per string
 );
 
 create table fct_fund_char (
@@ -220,6 +224,8 @@ create table fct_fund_performance (
 	batch_uuid String,
 	fund_uuid String,
 	asof_date date,
+	default_rate String,
+	perf_category String,
 	itd String,
 	ytd String,
 	month1 String,

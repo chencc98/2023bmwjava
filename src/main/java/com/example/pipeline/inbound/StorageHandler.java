@@ -49,6 +49,12 @@ public class StorageHandler {
         return temp.getAbsolutePath();
     }
 
+    public static String saveDataToTemp(String data) throws IOException {
+        File temp = File.createTempFile("saveDataToTemp", ".tmp");
+        FileUtils.writeStringToFile(temp, data, "UTF-8", true);
+        return temp.getAbsolutePath();
+    }
+
     public static String getPreviousFile(FeedInbound inbound) {
         String folder = STORAGE_ROOT + AppProp.getLastRunFolder();
         folder += inbound.getVendorCode().toLowerCase() + "/";
@@ -91,6 +97,8 @@ public class StorageHandler {
         dbClient.uploadFile(AppProp.getWorkareaOnDataBricks(), newFilename, new File(file));
 
         //insert a sql
+        dbClient.insertDatabricksBatch(batchId, inbound.getFeedUuid(), inbound.getUuid(),
+            AppProp.getWorkareaOnDataBricks() + "/" + newFilename);
     }
 
     public static void moveToArchive(FeedInbound inbound, String file) throws IOException {

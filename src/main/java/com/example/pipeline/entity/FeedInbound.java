@@ -6,6 +6,7 @@ import java.util.Date;
 //import org.springframework.scheduling.support.SimpleTriggerContext;
 
 import com.example.pipeline.inbound.PullMethod;
+import com.example.pipeline.inbound.PushMethod;
 import com.example.pipeline.inbound.ScheduleHandler;
 import com.example.pipeline.utils.Constants;
 import com.example.pipeline.utils.MyUtils;
@@ -60,6 +61,18 @@ public class FeedInbound {
         try {
             Class<PullMethod> c = (Class<PullMethod>)Class.forName(clz);
             PullMethod pull = c.newInstance();
+            return pull;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    public PushMethod getPushWorker() {
+        String clz = this.getPushMethodWorker();
+        try {
+            Class<PushMethod> c = (Class<PushMethod>)Class.forName(clz);
+            PushMethod pull = c.newInstance();
             return pull;
         } catch (Exception e) {
             log.error(e.getMessage(), e);

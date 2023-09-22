@@ -66,6 +66,10 @@ public class MyUtils {
         return t;
     }
 
+    public static String obj2Str(Object obj) throws JsonProcessingException {
+        return om.writeValueAsString(obj);
+    }
+
     public static String getFilePrefix(String file) {
         int index = file.indexOf(".");
         if (index < 0) {
